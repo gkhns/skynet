@@ -80,3 +80,5 @@ We can use the **smbclient** to enter the anonymous share. Here are the commonly
  ```sh
  hydra -l milesdyson -P log1.txt 10.10.48.162 http-post-form "/squirrelmail/src/redirect.php:login_username=^USER^&secretkey=^PASS^:F=incorrect" -V -F -u
 ```
+![image](https://user-images.githubusercontent.com/99097743/170764972-17fd4f81-db5a-40c1-862f-6014aa37ce7c.png)
+
