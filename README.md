@@ -84,3 +84,5 @@ We can use the **smbclient** to enter the anonymous share. Here are the commonly
 
 We now have access to the email account!
 
+![image](https://user-images.githubusercontent.com/99097743/170765416-03b102ff-c975-4637-a994-d061991061c4.png)
+
