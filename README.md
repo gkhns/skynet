@@ -1,4 +1,4 @@
-#Linux #  # 
+#Linux #SMB  # 
 
 skynet: A vulnerable Terminator themed Linux machine
 
